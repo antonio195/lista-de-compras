@@ -1,4 +1,4 @@
-package com.antoniocostadossantos.listadecompras.ui.theme
+package com.antoniocostadossantos.listadecompras.presenter.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

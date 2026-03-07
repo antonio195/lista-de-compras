@@ -1,4 +1,4 @@
-package com.antoniocostadossantos.listadecompras.ui.theme
+package com.antoniocostadossantos.listadecompras.presenter.theme
 
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
