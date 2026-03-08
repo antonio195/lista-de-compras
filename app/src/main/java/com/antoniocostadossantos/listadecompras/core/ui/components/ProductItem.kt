@@ -96,7 +96,7 @@ fun ProductItem(
                         modifier = Modifier
                             .size(8.dp)
                     )
-                    Text("Quantidade: ${product.totalItems}")
+                    Text("Quantidade: ${product.itemCount}")
                     Spacer(
                         modifier = Modifier
                             .size(8.dp)
@@ -150,7 +150,7 @@ private fun ProductItemPreview() {
             name = "Cebola",
             unitPrice = 10.22,
             totalPrice = 10.22,
-            totalItems = 23
+            itemCount = 23
         ),
         increaseCount = {},
         decreaseCount = {},

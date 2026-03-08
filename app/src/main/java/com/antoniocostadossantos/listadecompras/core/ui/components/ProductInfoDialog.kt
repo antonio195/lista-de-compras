@@ -58,10 +58,10 @@ fun ProductInfoDialog(
                 } else {
                     "${product.unitPrice}"
                 }
-                val defaultCount = if (product?.totalItems == null) {
+                val defaultCount = if (product?.itemCount == null) {
                     ""
                 } else {
-                    "${product.totalItems}"
+                    "${product.itemCount}"
                 }
                 var productName by remember { mutableStateOf(product?.name.orEmpty()) }
                 var productPrice by remember { mutableStateOf(defaultPrice) }

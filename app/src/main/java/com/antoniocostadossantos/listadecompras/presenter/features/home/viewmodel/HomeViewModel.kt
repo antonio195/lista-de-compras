@@ -24,8 +24,11 @@ class HomeViewModel(
     fun handleIntent(intent: HomeIntent) {
         when (intent) {
             HomeIntent.HideAddProductBottomSheet -> hideAddProductBottomSheet()
+            HomeIntent.ShowAddProductBottomSheet -> showAddProductBottomSheet()
             HomeIntent.LoadProducts -> loadProducts()
             HomeIntent.HideProductOptions -> hideProductOptions()
+            is HomeIntent.DeleteProduct -> deleteProduct(intent.product)
+            is HomeIntent.EditProduct -> editProduct(intent.product)
             is HomeIntent.ShowProductOptions -> showProductOptions(intent.product)
             is HomeIntent.SaveProduct -> saveNewProduct(
                 id = intent.id,
@@ -34,13 +37,12 @@ class HomeViewModel(
                 productCount = intent.productCount
             )
 
-            HomeIntent.ShowAddProductBottomSheet -> showAddProductBottomSheet()
             is HomeIntent.IncreaseProductCount -> {
-                val newTotalItems = intent.product.totalItems + 1
+                val newTotalItems = intent.product.itemCount + 1
                 val totalPrice = intent.product.unitPrice * newTotalItems
 
                 val updated = intent.product.copy(
-                    totalItems = newTotalItems,
+                    itemCount = newTotalItems,
                     totalPrice = totalPrice.formatPrice().toDouble()
                 )
 
@@ -48,23 +50,20 @@ class HomeViewModel(
             }
 
             is HomeIntent.DecreaseProductCount -> {
-                val newTotalItems = (intent.product.totalItems - 1).coerceAtLeast(0)
+                val newTotalItems = (intent.product.itemCount - 1).coerceAtLeast(0)
                 val totalPrice = intent.product.unitPrice * newTotalItems
 
                 val updated = intent.product.copy(
-                    totalItems = newTotalItems,
+                    itemCount = newTotalItems,
                     totalPrice = totalPrice.formatPrice().toDouble()
                 )
 
                 updateProduct(updated)
             }
-
-            is HomeIntent.DeleteProduct -> deleteProduct(intent.product)
-            is HomeIntent.EditProduct -> editProduct(intent.product)
         }
     }
 
-    private fun editProduct(product: Product){
+    private fun editProduct(product: Product) {
         viewModelScope.launch(IO) {
             _homeViewState.value = _homeViewState.value.copy(
                 selectedProduct = product,
@@ -94,7 +93,7 @@ class HomeViewModel(
         _homeViewState.value = _homeViewState.value.copy(isLoading = true)
         viewModelScope.launch(IO) {
             productRepository.getAllProducts().collect { products ->
-                val totalPrice = products.sumOf { it.unitPrice * it.totalItems }
+                val totalPrice = products.sumOf { it.unitPrice * it.itemCount }
                 _homeViewState.value = _homeViewState.value.copy(
                     isLoading = false,
                     products = products,
@@ -117,7 +116,7 @@ class HomeViewModel(
                 name = name,
                 unitPrice = price,
                 totalPrice = totalPrice,
-                totalItems = productCount
+                itemCount = productCount
             )
             productRepository.newProduct(newProduct)
             hideAddProductBottomSheet()

@@ -126,7 +126,7 @@ private fun ProductOptionsPreview() {
             name = "Cebola",
             unitPrice = 2.99,
             totalPrice = 2.99,
-            totalItems = 2
+            itemCount = 2
         )
     )
 }

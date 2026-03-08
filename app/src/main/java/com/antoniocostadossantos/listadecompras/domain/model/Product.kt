@@ -19,5 +19,5 @@ data class Product(
     val totalPrice: Double,
 
     @ColumnInfo(name = "totalItems")
-    val totalItems: Int = 0
+    val itemCount: Int = 0
 )
