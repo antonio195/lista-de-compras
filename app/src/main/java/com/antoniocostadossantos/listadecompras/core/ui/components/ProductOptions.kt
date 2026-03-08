@@ -1,4 +1,4 @@
-package com.antoniocostadossantos.listadecompras.core.components
+package com.antoniocostadossantos.listadecompras.core.ui.components
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement

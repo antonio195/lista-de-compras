@@ -1,4 +1,4 @@
-package com.antoniocostadossantos.listadecompras.presenter.theme
+package com.antoniocostadossantos.listadecompras.core.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

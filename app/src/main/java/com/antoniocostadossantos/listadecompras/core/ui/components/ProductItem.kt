@@ -1,4 +1,4 @@
-package com.antoniocostadossantos.listadecompras.core.components
+package com.antoniocostadossantos.listadecompras.core.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable

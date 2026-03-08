@@ -1,5 +1,6 @@
-package com.antoniocostadossantos.listadecompras.core.components
+package com.antoniocostadossantos.listadecompras.core.ui.components
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -19,6 +20,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -39,6 +41,9 @@ fun ProductInfoDialog(
         productCount: Int
     ) -> Unit,
 ) {
+
+    val context = LocalContext.current
+
     BasicAlertDialog(
         onDismissRequest = onDismissDialog
     ) {
@@ -138,12 +143,20 @@ fun ProductInfoDialog(
                         } else {
                             productCount.toInt()
                         }
-                        onSaveButtonClick(
-                            product?.id,
-                            productName,
-                            newProductPrice,
-                            newProductCount
-                        )
+                        if (productName.isNotEmpty()) {
+                            onSaveButtonClick(
+                                product?.id,
+                                productName,
+                                newProductPrice,
+                                newProductCount
+                            )
+                        } else {
+                            Toast.makeText(
+                                context,
+                                "Insira o nome do produto",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
                     }
                 ) {
                     Text(

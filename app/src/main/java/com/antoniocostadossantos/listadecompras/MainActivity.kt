@@ -9,7 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import com.antoniocostadossantos.listadecompras.presenter.features.home.ui.HomeScreen
-import com.antoniocostadossantos.listadecompras.presenter.theme.ListaDeComprasTheme
+import com.antoniocostadossantos.listadecompras.core.ui.theme.ListaDeComprasTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
