@@ -8,6 +8,8 @@ sealed class HomeIntent {
     data object HideAddProductBottomSheet : HomeIntent()
     data class ShowProductOptions(val product: Product) : HomeIntent()
     data object HideProductOptions : HomeIntent()
+    data class ShowToast(val message: String) : HomeIntent()
+    data object ClearToast : HomeIntent()
     data class DeleteProduct(val product: Product) : HomeIntent()
     data class EditProduct(val product: Product) : HomeIntent()
     data class IncreaseProductCount(val product: Product) : HomeIntent()

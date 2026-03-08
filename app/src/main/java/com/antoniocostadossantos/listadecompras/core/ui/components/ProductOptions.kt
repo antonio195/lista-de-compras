@@ -1,6 +1,5 @@
 package com.antoniocostadossantos.listadecompras.core.ui.components
 
-import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -33,6 +32,7 @@ import com.antoniocostadossantos.listadecompras.domain.model.Product
 fun ProductOptions(
     modifier: Modifier = Modifier,
     product: Product,
+    showToastMessage: (String) -> Unit,
     onDismissDialog: () -> Unit,
     onDeleteItem: (Product) -> Unit,
     onEditItem: (Product) -> Unit,
@@ -88,11 +88,7 @@ fun ProductOptions(
                         modifier = Modifier,
                         onClick = {
                             onDeleteItem(product)
-                            Toast.makeText(
-                                context,
-                                "Produto deletado",
-                                Toast.LENGTH_SHORT
-                            ).show()
+                            showToastMessage("Produto deletado")
                         },
                         shape = ButtonDefaults.outlinedShape,
                         colors = ButtonDefaults.outlinedButtonColors(),
@@ -127,6 +123,7 @@ private fun ProductOptionsPreview() {
             unitPrice = 2.99,
             totalPrice = 2.99,
             itemCount = 2
-        )
+        ),
+        showToastMessage = {}
     )
 }

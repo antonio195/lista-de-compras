@@ -9,4 +9,5 @@ data class HomeUiViewState(
     val isProductOptions: Boolean = false,
     val totalPrice: Double = 0.0,
     val selectedProduct: Product? = null,
+    val toastMessage: String? = null,
 )

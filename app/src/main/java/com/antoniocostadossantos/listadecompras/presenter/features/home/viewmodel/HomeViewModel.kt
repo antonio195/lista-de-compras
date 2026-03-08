@@ -27,6 +27,8 @@ class HomeViewModel(
             HomeIntent.ShowAddProductBottomSheet -> showAddProductBottomSheet()
             HomeIntent.LoadProducts -> loadProducts()
             HomeIntent.HideProductOptions -> hideProductOptions()
+            HomeIntent.ClearToast -> clearToastMessage()
+            is HomeIntent.ShowToast -> showMessage(intent.message)
             is HomeIntent.DeleteProduct -> deleteProduct(intent.product)
             is HomeIntent.EditProduct -> editProduct(intent.product)
             is HomeIntent.ShowProductOptions -> showProductOptions(intent.product)
@@ -43,7 +45,7 @@ class HomeViewModel(
 
                 val updated = intent.product.copy(
                     itemCount = newTotalItems,
-                    totalPrice = totalPrice.formatPrice().toDouble()
+                    totalPrice = totalPrice.formatPrice()
                 )
 
                 updateProduct(updated)
@@ -55,11 +57,27 @@ class HomeViewModel(
 
                 val updated = intent.product.copy(
                     itemCount = newTotalItems,
-                    totalPrice = totalPrice.formatPrice().toDouble()
+                    totalPrice = totalPrice.formatPrice()
                 )
 
                 updateProduct(updated)
             }
+        }
+    }
+
+    private fun showMessage(message: String) {
+        viewModelScope.launch(IO) {
+            _homeViewState.value = _homeViewState.value.copy(
+                toastMessage = message
+            )
+        }
+    }
+
+    private fun clearToastMessage() {
+        viewModelScope.launch(IO) {
+            _homeViewState.value = _homeViewState.value.copy(
+                toastMessage = null
+            )
         }
     }
 
@@ -97,7 +115,7 @@ class HomeViewModel(
                 _homeViewState.value = _homeViewState.value.copy(
                     isLoading = false,
                     products = products,
-                    totalPrice = totalPrice.formatPrice().toDouble()
+                    totalPrice = totalPrice.formatPrice()
                 )
             }
         }
@@ -115,7 +133,7 @@ class HomeViewModel(
                 id = id,
                 name = name,
                 unitPrice = price,
-                totalPrice = totalPrice,
+                totalPrice = totalPrice.formatPrice(),
                 itemCount = productCount
             )
             productRepository.newProduct(newProduct)

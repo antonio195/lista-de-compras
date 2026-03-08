@@ -1,6 +1,5 @@
 package com.antoniocostadossantos.listadecompras.core.ui.components
 
-import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -20,7 +19,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -33,6 +31,7 @@ import com.antoniocostadossantos.listadecompras.domain.model.Product
 fun ProductInfoDialog(
     modifier: Modifier = Modifier,
     product: Product?,
+    showWarningMessage: (String) -> Unit,
     onDismissDialog: () -> Unit,
     onSaveButtonClick: (
         productId: Int?,
@@ -41,9 +40,6 @@ fun ProductInfoDialog(
         productCount: Int
     ) -> Unit,
 ) {
-
-    val context = LocalContext.current
-
     BasicAlertDialog(
         onDismissRequest = onDismissDialog
     ) {
@@ -102,7 +98,9 @@ fun ProductInfoDialog(
                     modifier = Modifier
                         .fillMaxWidth(),
                     value = productPrice,
-                    onValueChange = { productPrice = it },
+                    onValueChange = {
+                        productPrice = it.replace(",", ".")
+                    },
                     label = { Text("Preço do produto") },
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Number
@@ -118,7 +116,9 @@ fun ProductInfoDialog(
                     modifier = Modifier
                         .fillMaxWidth(),
                     value = productCount,
-                    onValueChange = { productCount = it },
+                    onValueChange = {
+                        productCount = it.replace(",", ".")
+                    },
                     label = { Text("Quantidade do produto") },
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Number
@@ -151,11 +151,7 @@ fun ProductInfoDialog(
                                 newProductCount
                             )
                         } else {
-                            Toast.makeText(
-                                context,
-                                "Insira o nome do produto",
-                                Toast.LENGTH_SHORT
-                            ).show()
+                            showWarningMessage("Insira o nome do produto")
                         }
                     }
                 ) {

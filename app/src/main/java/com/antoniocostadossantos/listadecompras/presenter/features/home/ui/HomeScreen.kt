@@ -1,5 +1,6 @@
 package com.antoniocostadossantos.listadecompras.presenter.features.home.ui
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,8 +12,10 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.antoniocostadossantos.listadecompras.core.extensions.orFalse
 import com.antoniocostadossantos.listadecompras.core.ui.components.ProductInfoDialog
 import com.antoniocostadossantos.listadecompras.core.ui.components.ProductItem
 import com.antoniocostadossantos.listadecompras.core.ui.components.ProductOptions
@@ -29,8 +32,8 @@ fun HomeScreen(
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = koinViewModel()
 ) {
-
     val uiState by viewModel.homeViewState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
 
     Scaffold(
         bottomBar = {
@@ -85,7 +88,10 @@ fun HomeScreen(
             onDismissDialog = {
                 viewModel.handleIntent(HomeIntent.HideAddProductBottomSheet)
             },
-            product = uiState.selectedProduct
+            product = uiState.selectedProduct,
+            showWarningMessage = {
+                viewModel.handleIntent(HomeIntent.ShowToast(it))
+            }
         ) { id, productName, productPrice, productCount ->
             viewModel.handleIntent(
                 HomeIntent.SaveProduct(
@@ -99,9 +105,9 @@ fun HomeScreen(
     }
 
     if (uiState.isProductOptions) {
-        uiState.selectedProduct?.let {
+        uiState.selectedProduct?.let { product ->
             ProductOptions(
-                product = it,
+                product = product,
                 onDismissDialog = {
                     viewModel.handleIntent(HomeIntent.HideProductOptions)
                 },
@@ -110,8 +116,16 @@ fun HomeScreen(
                 },
                 onEditItem = { product ->
                     viewModel.handleIntent(HomeIntent.EditProduct(product))
+                },
+                showToastMessage = {
+                    viewModel.handleIntent(HomeIntent.ShowToast(it))
                 }
             )
         }
+    }
+
+    if (uiState.toastMessage?.isNotEmpty().orFalse()) {
+        Toast.makeText(context, uiState.toastMessage, Toast.LENGTH_SHORT).show()
+        viewModel.handleIntent(HomeIntent.ClearToast)
     }
 }
