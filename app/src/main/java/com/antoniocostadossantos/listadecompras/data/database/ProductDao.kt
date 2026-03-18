@@ -14,8 +14,8 @@ interface ProductDao {
     @Query("SELECT * FROM product")
     fun getAll(): Flow<List<Product>>
 
-    @Query("SELECT * FROM Product WHERE id =:productId")
-    fun getProduct(productId: Long): Flow<Product>
+    @Query("SELECT * FROM Product WHERE name LIKE '%' || :filter || '%'")
+    fun getProductsByFilter(filter: String): Flow<List<Product>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertProduct(product: Product): Long

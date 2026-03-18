@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -13,12 +14,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.antoniocostadossantos.listadecompras.core.extensions.orFalse
 import com.antoniocostadossantos.listadecompras.core.ui.components.ProductInfoDialog
 import com.antoniocostadossantos.listadecompras.core.ui.components.ProductItem
 import com.antoniocostadossantos.listadecompras.core.ui.components.ProductOptions
+import com.antoniocostadossantos.listadecompras.core.ui.components.SearchBar
 import com.antoniocostadossantos.listadecompras.core.ui.components.TotalValue
 import com.antoniocostadossantos.listadecompras.core.ui.screens.DefaultEmptyListScreen
 import com.antoniocostadossantos.listadecompras.core.ui.screens.DefaultLoadingScreen
@@ -36,17 +39,9 @@ fun HomeScreen(
     val context = LocalContext.current
 
     Scaffold(
-        bottomBar = {
-            if (uiState.isLoading.not()) {
-                TotalValue(
-                    totalPrice = uiState.totalPrice,
-                    onAddButtonClick = {
-                        viewModel.handleIntent(HomeIntent.ShowAddProductBottomSheet)
-                    }
-                )
-            }
-        },
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier
+            .fillMaxSize()
+            .safeDrawingPadding(),
     ) { innerPadding ->
         Column(
             modifier = Modifier.padding(innerPadding)
@@ -54,13 +49,25 @@ fun HomeScreen(
             if (uiState.isLoading) {
                 DefaultLoadingScreen()
             } else if (uiState.products.isNotEmpty()) {
-                LazyColumn(
+                SearchBar(
                     modifier = Modifier
                         .padding(horizontal = 16.dp),
+                    searchValue = uiState.searchBarValue,
+                    onSearchValueChange = {
+                        viewModel.handleIntent(HomeIntent.SearchNewValue(it))
+                    },
+                    onClearSearchValue = {
+                        viewModel.handleIntent(HomeIntent.ClearSearchBar)
+                    }
+                )
+                LazyColumn(
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                        .weight(1f),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     items(
-                        uiState.products,
+                        items = uiState.products,
                         key = { it.id!! }
                     ) { product ->
                         ProductItem(
@@ -77,7 +84,26 @@ fun HomeScreen(
                         )
                     }
                 }
+                TotalValue(
+                    modifier = Modifier
+                        .padding(bottom = 8.dp),
+                    totalPrice = uiState.totalPrice,
+                    onAddButtonClick = {
+                        viewModel.handleIntent(HomeIntent.ShowAddProductBottomSheet)
+                    }
+                )
             } else {
+                SearchBar(
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp),
+                    searchValue = uiState.searchBarValue,
+                    onSearchValueChange = {
+                        viewModel.handleIntent(HomeIntent.SearchNewValue(it))
+                    },
+                    onClearSearchValue = {
+                        viewModel.handleIntent(HomeIntent.ClearSearchBar)
+                    }
+                )
                 DefaultEmptyListScreen()
             }
         }
@@ -128,4 +154,12 @@ fun HomeScreen(
         Toast.makeText(context, uiState.toastMessage, Toast.LENGTH_SHORT).show()
         viewModel.handleIntent(HomeIntent.ClearToast)
     }
+}
+
+@Preview(
+    showBackground = true
+)
+@Composable
+private fun HomeScreenPreview() {
+    HomeScreen()
 }

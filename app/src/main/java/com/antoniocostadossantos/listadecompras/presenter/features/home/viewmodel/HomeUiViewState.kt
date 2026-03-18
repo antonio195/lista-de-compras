@@ -10,4 +10,5 @@ data class HomeUiViewState(
     val totalPrice: Double = 0.0,
     val selectedProduct: Product? = null,
     val toastMessage: String? = null,
+    val searchBarValue: String = ""
 )

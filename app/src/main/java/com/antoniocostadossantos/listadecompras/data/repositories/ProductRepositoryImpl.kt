@@ -8,6 +8,7 @@ class ProductRepositoryImpl(
     private val productDao: ProductDao
 ) : ProductRepository {
     override fun getAllProducts() = productDao.getAll()
+    override fun getProductsByFilter(filter: String) = productDao.getProductsByFilter(filter)
     override suspend fun newProduct(newProduct: Product) = productDao.insertProduct(newProduct)
     override suspend fun deleteProduct(newProduct: Product) = productDao.deleteProduct(newProduct)
 }

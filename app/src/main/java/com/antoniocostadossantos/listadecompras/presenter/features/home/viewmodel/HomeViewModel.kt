@@ -3,11 +3,12 @@ package com.antoniocostadossantos.listadecompras.presenter.features.home.viewmod
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.antoniocostadossantos.listadecompras.core.extensions.formatPrice
+import com.antoniocostadossantos.listadecompras.core.extensions.normalize
 import com.antoniocostadossantos.listadecompras.domain.model.Product
 import com.antoniocostadossantos.listadecompras.domain.repositories.ProductRepository
-import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class HomeViewModel(
@@ -28,6 +29,8 @@ class HomeViewModel(
             HomeIntent.LoadProducts -> loadProducts()
             HomeIntent.HideProductOptions -> hideProductOptions()
             HomeIntent.ClearToast -> clearToastMessage()
+            HomeIntent.ClearSearchBar -> clearSearchBar()
+            is HomeIntent.SearchNewValue -> onChangeSearchBarValue(intent.newSearchValue)
             is HomeIntent.ShowToast -> showMessage(intent.message)
             is HomeIntent.DeleteProduct -> deleteProduct(intent.product)
             is HomeIntent.EditProduct -> editProduct(intent.product)
@@ -65,58 +68,98 @@ class HomeViewModel(
         }
     }
 
+    private fun onChangeSearchBarValue(newSearchValue: String) {
+        viewModelScope.launch {
+            val sortedProducts = _homeViewState.value.products.filter {
+                it.name.lowercase().normalize().contains(newSearchValue)
+            }
+            _homeViewState.update {
+                _homeViewState.value.copy(
+                    searchBarValue = newSearchValue,
+                    products = sortedProducts
+                )
+            }
+        }
+    }
+
+    private fun clearSearchBar() {
+        viewModelScope.launch {
+            _homeViewState.update {
+                _homeViewState.value.copy(
+                    searchBarValue = ""
+                )
+            }
+            loadProducts(false)
+        }
+    }
+
     private fun showMessage(message: String) {
-        viewModelScope.launch(IO) {
-            _homeViewState.value = _homeViewState.value.copy(
-                toastMessage = message
-            )
+        viewModelScope.launch {
+            _homeViewState.update {
+                _homeViewState.value.copy(
+                    toastMessage = message
+                )
+            }
         }
     }
 
     private fun clearToastMessage() {
-        viewModelScope.launch(IO) {
-            _homeViewState.value = _homeViewState.value.copy(
-                toastMessage = null
-            )
+        viewModelScope.launch {
+            _homeViewState.update {
+                _homeViewState.value.copy(
+                    toastMessage = null
+                )
+            }
         }
     }
 
     private fun editProduct(product: Product) {
-        viewModelScope.launch(IO) {
-            _homeViewState.value = _homeViewState.value.copy(
-                selectedProduct = product,
-                isProductOptions = false,
-                isAddProductBottomSheetOpen = true
-            )
+        viewModelScope.launch {
+            _homeViewState.update {
+                _homeViewState.value.copy(
+                    selectedProduct = product,
+                    isProductOptions = false,
+                    isAddProductBottomSheetOpen = true
+                )
+            }
         }
     }
 
     private fun deleteProduct(product: Product) {
-        viewModelScope.launch(IO) {
-            _homeViewState.value = _homeViewState.value.copy(
-                selectedProduct = null,
-                isProductOptions = false
-            )
+        viewModelScope.launch {
+            _homeViewState.update {
+                _homeViewState.value.copy(
+                    selectedProduct = null,
+                    isProductOptions = false
+                )
+            }
             productRepository.deleteProduct(product)
         }
     }
 
     private fun updateProduct(product: Product) {
-        viewModelScope.launch(IO) {
+        viewModelScope.launch {
             productRepository.newProduct(product)
         }
     }
 
-    private fun loadProducts() {
-        _homeViewState.value = _homeViewState.value.copy(isLoading = true)
-        viewModelScope.launch(IO) {
+    private fun loadProducts(shouldShowLoading: Boolean = true) {
+        _homeViewState.update {
+            _homeViewState.value.copy(isLoading = shouldShowLoading)
+        }
+        viewModelScope.launch {
             productRepository.getAllProducts().collect { products ->
+                val sortedProducts = products.sortedBy {
+                    it.name
+                }
                 val totalPrice = products.sumOf { it.unitPrice * it.itemCount }
-                _homeViewState.value = _homeViewState.value.copy(
-                    isLoading = false,
-                    products = products,
-                    totalPrice = totalPrice.formatPrice()
-                )
+                _homeViewState.update {
+                    _homeViewState.value.copy(
+                        isLoading = false,
+                        products = sortedProducts,
+                        totalPrice = totalPrice.formatPrice()
+                    )
+                }
             }
         }
     }
@@ -127,7 +170,7 @@ class HomeViewModel(
         price: Double,
         productCount: Int,
     ) {
-        viewModelScope.launch(IO) {
+        viewModelScope.launch {
             val totalPrice = price * productCount
             val newProduct = Product(
                 id = id,
@@ -142,24 +185,32 @@ class HomeViewModel(
     }
 
     private fun showProductOptions(product: Product) {
-        _homeViewState.value = _homeViewState.value.copy(
-            isProductOptions = true,
-            selectedProduct = product
-        )
+        _homeViewState.update {
+            _homeViewState.value.copy(
+                isProductOptions = true,
+                selectedProduct = product
+            )
+        }
     }
 
     private fun hideProductOptions() {
-        _homeViewState.value = _homeViewState.value.copy(isProductOptions = false)
+        _homeViewState.update {
+            _homeViewState.value.copy(isProductOptions = false)
+        }
     }
 
     private fun showAddProductBottomSheet() {
-        _homeViewState.value = _homeViewState.value.copy(isAddProductBottomSheetOpen = true)
+        _homeViewState.update {
+            _homeViewState.value.copy(isAddProductBottomSheetOpen = true)
+        }
     }
 
     private fun hideAddProductBottomSheet() {
-        _homeViewState.value = _homeViewState.value.copy(
-            isAddProductBottomSheetOpen = false,
-            selectedProduct = null
-        )
+        _homeViewState.update {
+            _homeViewState.value.copy(
+                isAddProductBottomSheetOpen = false,
+                selectedProduct = null
+            )
+        }
     }
 }

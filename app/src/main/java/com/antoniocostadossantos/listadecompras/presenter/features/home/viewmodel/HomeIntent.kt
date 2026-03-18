@@ -12,6 +12,8 @@ sealed class HomeIntent {
     data object ClearToast : HomeIntent()
     data class DeleteProduct(val product: Product) : HomeIntent()
     data class EditProduct(val product: Product) : HomeIntent()
+    data object ClearSearchBar : HomeIntent()
+    data class SearchNewValue(val newSearchValue: String) : HomeIntent()
     data class IncreaseProductCount(val product: Product) : HomeIntent()
     data class DecreaseProductCount(val product: Product) : HomeIntent()
     data class SaveProduct(
